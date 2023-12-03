@@ -43,10 +43,10 @@ This is what is then used to determine if to change the status of the order or n
 
 ## Disclaimer
 
-This plugin does not have any relation with WooCommerce or M-PESA.
-The plugin’s purpose is just to help in linking the WooCommerce plugin with the M-PESA payment method.
-THE PLUGIN SHOULD AT NO POINT BE HELD RESPONSIBLE IF THE DARAJA ENDPOINT IS UNREACHABLE OR UNABLE TO SERVE REQUESTS.
-In the plugin description there are links to other websites which are not under the control of WooCommerce M-PESA Payment Gateway Plugin. We have no control over the nature, content and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.
+- This plugin does not have any relation with WooCommerce or M-PESA.
+- The plugin’s purpose is just to help in linking the WooCommerce plugin with the M-PESA payment method.
+- THE PLUGIN SHOULD AT NO POINT BE HELD RESPONSIBLE IF THE DARAJA ENDPOINT IS UNREACHABLE OR UNABLE TO SERVE REQUESTS.
+- In the plugin description there are links to other websites which are not under the control of WooCommerce M-PESA Payment Gateway Plugin. We have no control over the nature, content and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.
 
 ## Installation
 
