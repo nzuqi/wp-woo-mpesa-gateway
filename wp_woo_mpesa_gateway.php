@@ -1,9 +1,6 @@
 <?php
 
-// Prevent direct access to the plugin
 defined('ABSPATH') or die("You're not allowed in here ;)");
-
-// Plugin header: Notifies WordPress of the existence of the plugin
 
 /* Plugin Name: WP WooCommerce M-Pesa Gateway 
 * Plugin URI: https://martin.co.ke
@@ -86,8 +83,8 @@ function wp_woo_mpesa_payment_gateway_init() {
             $this->id = 'mpesa';
             $this->icon = plugin_dir_url(__FILE__) . 'mpesa.png';
             $this->has_fields = false;
-            $this->method_title = __('M-PESA', 'woocommerce');
-            $this->method_description = __('Enable customers to make payments to your business shortcode');
+            $this->method_title = __('Lipa na M-PESA', 'woocommerce');
+            $this->method_description = __('Enable customers to make payments to your M-Pesa PayBill or Till number');
             
             // load the settings
             $this->init_form_fields();
@@ -124,7 +121,7 @@ function wp_woo_mpesa_payment_gateway_init() {
                 'enabled' => [
                     'title' => __('Enable/Disable', 'woocommerce'),
                     'type' => 'checkbox',
-                    'label' => __('Enable Mpesa Payments Gateway', 'woocommerce'),
+                    'label' => __('Enable lipa na M-PESA', 'woocommerce'),
                     'default' => 'yes',
                 ],
 
@@ -132,7 +129,7 @@ function wp_woo_mpesa_payment_gateway_init() {
                     'title' => __('Title', 'woocommerce'),
                     'type' => 'text',
                     'description' => __('This controls the title which the user sees during checkout.', 'woocommerce'),
-                    'default' => __('M-PESA', 'woocommerce'),
+                    'default' => __('Lipa na M-PESA', 'woocommerce'),
                     'desc_tip' => true,
                 ],
 
@@ -140,7 +137,7 @@ function wp_woo_mpesa_payment_gateway_init() {
                     'title' => __('Description', 'woocommerce'),
                     'type' => 'textarea',
                     'description' => __('Payment method description that the customer will see on your checkout.', 'woocommerce'),
-                    'default' => __('Place order and pay using M-PESA.'),
+                    'default' => __('Place order and pay using lipa na M-PESA.'),
                     'desc_tip' => true,
                 ],
 
@@ -148,8 +145,8 @@ function wp_woo_mpesa_payment_gateway_init() {
                     'title' => __('Instructions', 'woocommerce'),
                     'type' => 'textarea',
                     'description' => __('Instructions that will be added to the thank you page and emails.', 'woocommerce'),
-                    'default' => __('Place order and pay using M-PESA.', 'woocommerce'),
-                    // 'css'         => 'textarea { read-only};',
+                    'default' => __('Place order and pay using lipa na M-PESA.', 'woocommerce'),
+                    // 'css' => 'textarea { read-only};',
                     'desc_tip' => true,
                 ],
 
@@ -191,10 +188,28 @@ function wp_woo_mpesa_payment_gateway_init() {
                     'type' => 'password',
                 ],
 
+                'shortcode_type' => [
+                    'title' => __('Shortcode Type', 'woocommerce'),
+                    'default' => __('paybill', 'woocommerce'),
+                    'type' => 'select',
+                    'options' => array(
+                        'paybill' => __('PayBill', 'woocommerce' ),
+                        'till' => __('Till', 'woocommerce' )
+                    ),
+                ],
+
                 'shortcode' => [
                     'title' => __('Shortcode', 'woocommerce'),
                     'default' => __('', 'woocommerce'),
                     'type' => 'number',
+                ],
+
+                'store_number' => [
+                    'title' => __('Store Number (Optional)', 'woocommerce'),
+                    'description' => __('This is is the Head Office or Store number, used with Till numbers', 'woocommerce'),
+                    'default' => __('', 'woocommerce'),
+                    'type' => 'number',
+                    'desc_tip' => true,
                 ],
             ];
         }
@@ -206,8 +221,8 @@ function wp_woo_mpesa_payment_gateway_init() {
             /*
             *The heading and paragraph below are the ones that appear on the backend M-PESA settings page
             */
-            echo '<h3>' . 'M-PESA Payments Gateway' . '</h3>';
-            echo '<p>' . 'Payments Made Simple' . '</p>';
+            echo '<h3>' . 'Lipa na M-PESA gateway' . '</h3>';
+            echo '<p>' . 'Payments made simple' . '</p>';
             echo '<table class="form-table">';
             $this->generate_settings_html();
             echo '</table>';
@@ -252,7 +267,7 @@ function wp_woo_mpesa_payment_gateway_init() {
                 <?php echo $_SESSION['response_status']; ?>
                 <div id="commonname"></div>
                 <button onClick="pay()" class="button wp-woo-mpesa-btn">Pay now</button>
-                <button onClick="completeOrder()" class="button wp-woo-mpesa-btn">Complete Order</button>	
+                <button onClick="completeOrder()" class="button wp-woo-mpesa-btn">Complete order</button>	
                 <?php echo "<br/>";
             }
         }
@@ -354,35 +369,39 @@ function wp_woo_mpesa_request_payment() {
 
     ///If the access token is available, start lipa na mpesa process
     if (array_key_exists("access_token", $token_array->token_results[0])) {
-        ////Starting lipa na mpesa process
+        // Starting lipa na mpesa process
         $url = $_SESSION['payments_endpoint'];
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443 ? "https://" : "http://";
         $domainName = $_SERVER['HTTP_HOST'] . '/';
         $callback_url = $protocol . $domainName;
+        $shortcode_type = $_SESSION['shortcode_type'];
+        $transaction_type = 'CustomerPayBillOnline';
+        $business_shortCode = $_SESSION['shortcode'];
+        if ($shortcode_type == 'till') {
+            // The transaction type for M-PESA Express is "CustomerPayBillOnline" for PayBill Numbers and "CustomerBuyGoodsOnline" for Till Numbers.
+            // For Till Numbers, the BusinessShortCode is the H.O or Store number, and PartyB is the actual Till Number.
+            $transaction_type = 'CustomerBuyGoodsOnline';
+            $business_shortCode = $_SESSION['store_number'];
+        }
+        // For Till Numbers, the BusinessShortCode is the H.O Number. and PartyB is the actual Till Number.
 
-        //Generate the password//
+        // Generate the password //
         $shortcd = $_SESSION['shortcode'];
         $timestamp = date("YmdHis");
         $b64 = $shortcd . $_SESSION['passkey'] . $timestamp;
         $pwd = base64_encode($b64);
-        ///End in pwd generation//
+        // End in pwd generation //
 
         $curl_post_data = [
-            //Fill in the request parameters with valid values
-            // PS; For Till Numbers, the BusinessShortCode is the H.O Number. and PartyB is the actual Till Number.
-            'BusinessShortCode' => (int)$shortcd,
-            //'BusinessShortCode' => 7408378,
-            //'Password' => $pwd,
-            'Password' => 'MTc0Mzc5YmZiMjc5ZjlhYTliZGJjZjE1OGU5N2RkNzFhNDY3Y2QyZTBjODkzMDU5YjEwZjc4ZTZiNzJhZGExZWQyYzkxOTIwMTYwMjE2MTY1NjI3',
+            'BusinessShortCode' => (int)$business_shortCode,
+            'Password' => $pwd,
             'Timestamp' => $timestamp,
-            // PS; The transaction type for M-PESA Express is "CustomerPayBillOnline" for PayBill Numbers and "CustomerBuyGoodsOnline" for Till Numbers.
-            'TransactionType' => 'CustomerBuyGoodsOnline',
+            'TransactionType' => $transaction_type,
             'Amount' => $total,
             'PartyA' => (int)$_SESSION['tel'],
             'PartyB' => (int)$shortcd,
             'PhoneNumber' => (int)$_SESSION['tel'],
-            //'CallBackURL' => $callback_url . '/index.php?callback_action=1',
-            'CallBackURL' => $callback_url . '?callback_action=1',
+            'CallBackURL' => $callback_url . '/index.php?callback_action=1',
             'AccountReference' => time(),
             'TransactionDesc' => 'Sending a lipa na mpesa request',
         ];
@@ -390,7 +409,7 @@ function wp_woo_mpesa_request_payment() {
         $data_string = json_encode($curl_post_data);
 		// echo json_encode($curl_post_data); exit();
         $response = wp_remote_post($url, ['headers' => ['Content-Type' => 'application/json', 'Authorization' => 'Bearer ' . $access_token], 'body' => $data_string]);
-		echo $response['body']; exit();
+		// echo $response['body']; exit();
 
         $response_array = json_decode('{"callback_results":[' . $response['body'] . ']}');
 
