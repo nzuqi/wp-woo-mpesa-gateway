@@ -1,0 +1,21 @@
+.final_success {
+    color: green !important;
+    font-size: 20px !important;
+    padding: 5px 10px;
+}
+
+.waiting_success {
+    color: orange !important;
+    font-size: 20px !important;
+    padding: 5px 10px;
+}
+
+.error {
+    color: red !important;
+    font-size: 20px !important;
+    padding: 5px 10px;
+}
+
+.wp-woo-mpesa-btn {
+    margin: 10px;
+}
