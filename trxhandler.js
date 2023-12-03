@@ -35,6 +35,9 @@ const pay = () => {
                 document.getElementById("commonname").className = "error";
             }
             document.getElementById("commonname").innerHTML = obj2.resmsg;
+            // TODO: Debugging purposes, remove when done
+            console.log("Payload: ", JSON.parse(obj2.request.payload));
+            console.log("Response: ", JSON.parse(obj2.request.response));
         }
         if (this.status == 500) {
             document.getElementById("commonname").className = "error";

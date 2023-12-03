@@ -413,9 +413,7 @@ function wp_woo_mpesa_request_payment() {
         ];
 
         $data_string = json_encode($curl_post_data);
-		// echo json_encode($curl_post_data); exit();
         $response = wp_remote_post($url, ['headers' => ['Content-Type' => 'application/json', 'Authorization' => 'Bearer ' . $access_token], 'body' => $data_string]);
-		// echo $response['body']; exit();
 
         $response_array = json_decode('{"callback_results":[' . $response['body'] . ']}');
 
@@ -423,7 +421,15 @@ function wp_woo_mpesa_request_payment() {
             $_SESSION['ReqID'] = $response_array->callback_results[0]->MerchantRequestID;
             echo json_encode(["rescode" => "0", "resmsg" => "Request accepted for processing, check your phone to enter M-PESA pin"]);
         } else {
-            echo json_encode(["rescode" => "1", "resmsg" => "Payment request failed, please try again"]);
+            echo json_encode([
+                "rescode" => "1", 
+                "resmsg" => "Payment request failed, please try again; ", 
+                // TODO: Debugging purposes, remove when done
+                "request" => [
+                    "payload" => json_encode($curl_post_data), 
+                    "response" => $response['body'],
+                ],
+            ]);
         }
 
         exit();
