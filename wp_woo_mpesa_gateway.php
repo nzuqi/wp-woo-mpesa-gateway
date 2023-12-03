@@ -314,7 +314,7 @@ function wp_woo_mpesa_mpesatrx_install() {
     global $wpdb;
     global $trx_db_version;
     $trx_db_version = '1.0';
-    $table_name = $wpdb->prefix . 'mpesa_trx';
+    $table_name = $wpdb->prefix . 'woo_mpesa_trx';
     $charset_collate = $wpdb->get_charset_collate();
     $sql = "CREATE TABLE IF NOT EXISTS $table_name (
 		id mediumint(9) NOT NULL AUTO_INCREMENT,
@@ -341,7 +341,7 @@ function wp_woo_mpesa_request_payment() {
     global $wpdb;
 
     if (isset($_SESSION['ReqID'])) {
-        $table_name = $wpdb->prefix . 'mpesa_trx';
+        $table_name = $wpdb->prefix . 'woo_mpesa_trx';
         $trx_count = $wpdb->get_var("SELECT COUNT(*) FROM $table_name WHERE merchant_request_id = '" . $_SESSION['ReqID'] . "' and processing_status = 0");
         //If it exists do not allow the transaction to proceed to the next step
         if ($trx_count > 0) {
