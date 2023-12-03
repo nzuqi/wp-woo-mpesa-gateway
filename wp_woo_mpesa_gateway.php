@@ -14,18 +14,18 @@ defined('ABSPATH') or die("You're not allowed in here ;)");
 * Licence: GPL-3.0
 */
 
-add_action('plugins_loaded', 'woompesa_payment_gateway_init');
+add_action('plugins_loaded', 'wp_woo_mpesa_payment_gateway_init');
 
-function woompesa_adds_to_the_head() {
+function wp_woo_mpesa_adds_to_the_head() {
     wp_enqueue_script('Callbacks', plugin_dir_url(__FILE__) . 'trxhandler.js', ['jquery']);
     wp_enqueue_style('Responses', plugin_dir_url(__FILE__) . '/display.css', false, '1.1', 'all');
 }
 
 // Add the `css` and `js` files to the header
-add_action('wp_enqueue_scripts', 'woompesa_adds_to_the_head');
+add_action('wp_enqueue_scripts', 'wp_woo_mpesa_adds_to_the_head');
 
-// Calls the woompesa_mpesatrx_install function during plugin activation which creates table that records transactions.
-register_activation_hook(__FILE__, 'woompesa_mpesatrx_install');
+// Calls the wp_woo_mpesa_mpesatrx_install function during plugin activation which creates table that records transactions.
+register_activation_hook(__FILE__, 'wp_woo_mpesa_mpesatrx_install');
 
 // === Request payment start ===
 
@@ -44,7 +44,7 @@ add_action('wp', function () {
     /** This is an call for our custom action. */
     if (get_query_var('payment_action')) {
         // Request payment
-        woompesa_request_payment();
+        wp_woo_mpesa_request_payment();
     }
 });
 
@@ -64,13 +64,13 @@ add_filter('query_vars', function ($query_vars) {
 add_action('wp', function () {
     if (get_query_var('scanner_action')) {
         // invoke scanner function
-        woompesa_scan_transactions();
+        wp_woo_mpesa_scan_transactions();
     }
 });
 
 // === Transactions scanner end ===
 
-function woompesa_payment_gateway_init() {
+function wp_woo_mpesa_payment_gateway_init() {
     if (!class_exists('WC_Payment_Gateway')) {
         return;
     }
@@ -217,13 +217,13 @@ function woompesa_payment_gateway_init() {
         * Receipt Page
         **/
         public function receipt_page($order_id) {
-            echo $this->woompesa_generate_iframe($order_id);
+            echo $this->wp_woo_mpesa_generate_iframe($order_id);
         }
 
         /**
         * Function that posts the params to mpesa and generates the html for the page
         */
-        public function woompesa_generate_iframe($order_id) {
+        public function wp_woo_mpesa_generate_iframe($order_id) {
             global $woocommerce;
             $order = new WC_Order($order_id);
             $_SESSION['total'] = (int) $order->order_total;
@@ -285,17 +285,17 @@ function woompesa_payment_gateway_init() {
  * Filtering woocommerce_payment_gateways
  * Add the Gateway to WooCommerce
  **/
-function woompesa_add_gateway_class($methods) {
+function wp_woo_mpesa_add_gateway_class($methods) {
     $methods[] = 'WC_Gateway_Mpesa';
     return $methods;
 }
 
-if (!add_filter('woocommerce_payment_gateways', 'woompesa_add_gateway_class')) {
+if (!add_filter('woocommerce_payment_gateways', 'wp_woo_mpesa_add_gateway_class')) {
     die();
 }
 
 // Create Table for M-PESA Transactions
-function woompesa_mpesatrx_install() {
+function wp_woo_mpesa_mpesatrx_install() {
     global $wpdb;
     global $trx_db_version;
     $trx_db_version = '1.0';
@@ -321,7 +321,7 @@ function woompesa_mpesatrx_install() {
 }
 
 // === Payments start ===
-function woompesa_request_payment() {
+function wp_woo_mpesa_request_payment() {
     session_start();
     global $wpdb;
 
@@ -409,7 +409,7 @@ function woompesa_request_payment() {
 
 // === Scanner start ===
 
-function woompesa_scan_transactions() {
+function wp_woo_mpesa_scan_transactions() {
     //The code below is invoked after customer clicks on the Confirm Order button
     echo json_encode(["rescode" => "76", "resmsg" => "I'm working on this, please be patient ;)"]);
     exit();
