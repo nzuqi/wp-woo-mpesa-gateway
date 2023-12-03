@@ -11,7 +11,7 @@ defined('ABSPATH') or die("You're not allowed in here ;)");
 * Version: 1.0.0
 * Author: Martin Nzuki
 * Author URI: https://martin.co.ke
-* Licence: GNU
+* Licence: GPL-3.0
 */
 
 add_action('plugins_loaded', 'woompesa_payment_gateway_init');
