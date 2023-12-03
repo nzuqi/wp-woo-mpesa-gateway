@@ -11,7 +11,7 @@ defined('ABSPATH') or die("You're not allowed in here ;)");
 * Licence: GPL-3.0
 */
 
-add_action('plugins_loaded', 'wp_woo_mpesa_payment_gateway_init');
+add_action('plugins_loaded', 'wp_woo_mpesa_gateway_init');
 
 function wp_woo_mpesa_adds_to_the_head() {
     wp_enqueue_script('Callbacks', plugin_dir_url(__FILE__) . 'trxhandler.js', ['jquery']);
@@ -67,17 +67,19 @@ add_action('wp', function () {
 
 // === Transactions scanner end ===
 
-function wp_woo_mpesa_payment_gateway_init() {
+function wp_woo_mpesa_gateway_init() {
     if (!class_exists('WC_Payment_Gateway')) {
         return;
     }
 
-    class WC_Gateway_Mpesa extends WC_Payment_Gateway {
+    class WC_Mpesa_Gateway extends WC_Payment_Gateway {
         /**
         * Plugin constructor for the class
         */
         public function __construct(){
-            session_start();
+            if(!isset($_SESSION)) {
+                session_start(); 
+            }
 
             // Basic settings
             $this->id = 'mpesa';
@@ -101,7 +103,9 @@ function wp_woo_mpesa_payment_gateway_init() {
             $_SESSION['passkey'] = $this->get_option('passkey');
             $_SESSION['ck'] = $this->get_option('consumer_key');
             $_SESSION['cs'] = $this->get_option('consumer_secret');
+            $_SESSION['shortcode_type'] = $this->get_option('shortcode_type');
             $_SESSION['shortcode'] = $this->get_option('shortcode');
+            $_SESSION['store_number'] = $this->get_option('store_number');
 
             //Save the admin options
             if (version_compare(WOOCOMMERCE_VERSION, '2.0.0', '>=')) {
@@ -301,7 +305,7 @@ function wp_woo_mpesa_payment_gateway_init() {
  * Add the Gateway to WooCommerce
  **/
 function wp_woo_mpesa_add_gateway_class($methods) {
-    $methods[] = 'WC_Gateway_Mpesa';
+    $methods[] = 'WC_Mpesa_Gateway';
     return $methods;
 }
 
@@ -332,12 +336,14 @@ function wp_woo_mpesa_mpesatrx_install() {
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
     dbDelta($sql);
-    add_option('trx_db_version', $trx_db_version);
+    add_option('woo_trx_db_version', $trx_db_version);
 }
 
 // === Payments start ===
 function wp_woo_mpesa_request_payment() {
-    session_start();
+    if(!isset($_SESSION)) {
+        session_start(); 
+    }
     global $wpdb;
 
     if (isset($_SESSION['ReqID'])) {
