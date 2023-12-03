@@ -48,6 +48,10 @@ This is what is then used to determine if to change the status of the order or n
 - THE PLUGIN SHOULD AT NO POINT BE HELD RESPONSIBLE IF THE DARAJA ENDPOINT IS UNREACHABLE OR UNABLE TO SERVE REQUESTS.
 - In the plugin description there are links to other websites which are not under the control of WooCommerce M-PESA Payment Gateway Plugin. We have no control over the nature, content and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.
 
+## Compile
+
+Run `zip -r wp-woo-mpesa-gateway.zip ./ -x .vscode` to compile the plugin.
+
 ## Installation
 
 1. Unzip files
