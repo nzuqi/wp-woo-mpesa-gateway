@@ -55,10 +55,6 @@ In the plugin description there are links to other websites which are not under 
 3. Activate the plugin
 4. Update WooCommerce settings
 
-## Changelog
-
-= 1.0 =
-
 ## FAQ
 
 How does the customer authenticate the payment?
