@@ -2,7 +2,7 @@ var getHost = window.location.protocol + "//" + window.location.host + "/demos/e
 
 const completeOrder = () => {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = () => {
+    xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var obj = JSON.parse(this.responseText);
             if (obj.rescode == 0) {
@@ -26,7 +26,7 @@ const completeOrder = () => {
 
 const pay = () => {
     var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = () => {
+    xhttp.onreadystatechange = function () {
         if (this.readyState == 4 && this.status == 200) {
             var obj2 = JSON.parse(this.responseText);
             if (obj2.rescode == 0) {
