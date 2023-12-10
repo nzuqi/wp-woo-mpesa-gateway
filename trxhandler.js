@@ -1,4 +1,4 @@
-var getHost = window.location.protocol + "//" + window.location.host + "/demos/eshop";
+var getHost = window.location.protocol + "//" + window.location.host;
 
 const completeOrder = () => {
     var xhttp = new XMLHttpRequest();
