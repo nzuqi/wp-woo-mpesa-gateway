@@ -394,7 +394,7 @@ function wp_woo_mpesa_request_payment() {
         // Generate the password //
         $shortcd = $_SESSION['shortcode'];
         $timestamp = date("YmdHis");
-        $b64 = $shortcd . $_SESSION['passkey'] . $timestamp;
+        $b64 = $business_shortCode . $_SESSION['passkey'] . $timestamp;
         $pwd = base64_encode($b64);
         // End in pwd generation //
 
